@@ -1,0 +1,60 @@
+Baseline Semgrep scan - OWASP NodeGoat (unmodified, before fixes)
+Configs: p/javascript, p/nodejs, p/owasp-top-ten | Semgrep 1.177.0
+Total findings: 21  | Errors: 10
+By severity: WARNING=18, ERROR=3
+
+By rule:
+    6  WARNING  yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag
+    5  WARNING  html.security.plaintext-http-link.plaintext-http-link
+    3  ERROR    javascript.lang.security.audit.code-string-concat.code-string-concat
+    1  WARNING  javascript.express.security.audit.express-open-redirect.express-open-redirect
+    1  WARNING  javascript.express.security.audit.express-cookie-settings.express-cookie-session-default-name
+    1  WARNING  javascript.express.security.audit.express-cookie-settings.express-cookie-session-no-domain
+    1  WARNING  javascript.express.security.audit.express-cookie-settings.express-cookie-session-no-expires
+    1  WARNING  javascript.express.security.audit.express-cookie-settings.express-cookie-session-no-httponly
+    1  WARNING  javascript.express.security.audit.express-cookie-settings.express-cookie-session-no-path
+    1  WARNING  javascript.express.security.audit.express-cookie-settings.express-cookie-session-no-secure
+
+Findings:
+- [WARNING] .github/workflows/e2e-test.yml:16  yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag
+    GitHub Actions step uses a mutable tag or branch reference. Tags and branch names can be silently repointed by the action owner, enabling supply-chain attacks — as seen in the trivy-action and kics-github-action compromises. Pin the reference to a full 40-character commit SHA instead, e.g. `uses: ac
+- [WARNING] .github/workflows/e2e-test.yml:21  yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag
+    GitHub Actions step uses a mutable tag or branch reference. Tags and branch names can be silently repointed by the action owner, enabling supply-chain attacks — as seen in the trivy-action and kics-github-action compromises. Pin the reference to a full 40-character commit SHA instead, e.g. `uses: ac
+- [WARNING] .github/workflows/e2e-test.yml:26  yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag
+    GitHub Actions step uses a mutable tag or branch reference. Tags and branch names can be silently repointed by the action owner, enabling supply-chain attacks — as seen in the trivy-action and kics-github-action compromises. Pin the reference to a full 40-character commit SHA instead, e.g. `uses: ac
+- [WARNING] .github/workflows/e2e-test.yml:58  yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag
+    GitHub Actions step uses a mutable tag or branch reference. Tags and branch names can be silently repointed by the action owner, enabling supply-chain attacks — as seen in the trivy-action and kics-github-action compromises. Pin the reference to a full 40-character commit SHA instead, e.g. `uses: ac
+- [WARNING] .github/workflows/lint.yml:16  yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag
+    GitHub Actions step uses a mutable tag or branch reference. Tags and branch names can be silently repointed by the action owner, enabling supply-chain attacks — as seen in the trivy-action and kics-github-action compromises. Pin the reference to a full 40-character commit SHA instead, e.g. `uses: ac
+- [WARNING] .github/workflows/lint.yml:21  yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag
+    GitHub Actions step uses a mutable tag or branch reference. Tags and branch names can be silently repointed by the action owner, enabling supply-chain attacks — as seen in the trivy-action and kics-github-action compromises. Pin the reference to a full 40-character commit SHA instead, e.g. `uses: ac
+- [ERROR] app/routes/contributions.js:32  javascript.lang.security.audit.code-string-concat.code-string-concat
+    Found data from an Express or Next web request flowing to `eval`. If this data is user-controllable this can lead to execution of arbitrary system commands in the context of your application process. Avoid `eval` whenever possible.
+- [ERROR] app/routes/contributions.js:33  javascript.lang.security.audit.code-string-concat.code-string-concat
+    Found data from an Express or Next web request flowing to `eval`. If this data is user-controllable this can lead to execution of arbitrary system commands in the context of your application process. Avoid `eval` whenever possible.
+- [ERROR] app/routes/contributions.js:34  javascript.lang.security.audit.code-string-concat.code-string-concat
+    Found data from an Express or Next web request flowing to `eval`. If this data is user-controllable this can lead to execution of arbitrary system commands in the context of your application process. Avoid `eval` whenever possible.
+- [WARNING] app/routes/index.js:72  javascript.express.security.audit.express-open-redirect.express-open-redirect
+    The application redirects to a URL specified by user-supplied input `req` that is not validated. This could redirect users to malicious locations. Consider using an allow-list approach to validate URLs, or warn users they are being redirected to a third-party website.
+- [WARNING] app/views/tutorial/a2.html:207  html.security.plaintext-http-link.plaintext-http-link
+    This link points to a plaintext HTTP URL. Prefer an encrypted HTTPS URL if possible.
+- [WARNING] app/views/tutorial/a2.html:209  html.security.plaintext-http-link.plaintext-http-link
+    This link points to a plaintext HTTP URL. Prefer an encrypted HTTPS URL if possible.
+- [WARNING] app/views/tutorial/a2.html:210  html.security.plaintext-http-link.plaintext-http-link
+    This link points to a plaintext HTTP URL. Prefer an encrypted HTTPS URL if possible.
+- [WARNING] app/views/tutorial/a5.html:50  html.security.plaintext-http-link.plaintext-http-link
+    This link points to a plaintext HTTP URL. Prefer an encrypted HTTPS URL if possible.
+- [WARNING] app/views/tutorial/a5.html:51  html.security.plaintext-http-link.plaintext-http-link
+    This link points to a plaintext HTTP URL. Prefer an encrypted HTTPS URL if possible.
+- [WARNING] server.js:78  javascript.express.security.audit.express-cookie-settings.express-cookie-session-default-name
+    Don’t use the default session cookie name Using the default session cookie name can open your app to attacks. The security issue posed is similar to X-Powered-By: a potential attacker can use it to fingerprint the server and target attacks accordingly.
+- [WARNING] server.js:78  javascript.express.security.audit.express-cookie-settings.express-cookie-session-no-domain
+    Default session middleware settings: `domain` not set. It indicates the domain of the cookie; use it to compare against the domain of the server in which the URL is being requested. If they match, then check the path attribute next.
+- [WARNING] server.js:78  javascript.express.security.audit.express-cookie-settings.express-cookie-session-no-expires
+    Default session middleware settings: `expires` not set. Use it to set expiration date for persistent cookies.
+- [WARNING] server.js:78  javascript.express.security.audit.express-cookie-settings.express-cookie-session-no-httponly
+    Default session middleware settings: `httpOnly` not set. It ensures the cookie is sent only over HTTP(S), not client JavaScript, helping to protect against cross-site scripting attacks.
+- [WARNING] server.js:78  javascript.express.security.audit.express-cookie-settings.express-cookie-session-no-path
+    Default session middleware settings: `path` not set. It indicates the path of the cookie; use it to compare against the request path. If this and domain match, then send the cookie in the request.
+- [WARNING] server.js:78  javascript.express.security.audit.express-cookie-settings.express-cookie-session-no-secure
+    Default session middleware settings: `secure` not set. It ensures the browser only sends the cookie over HTTPS.
