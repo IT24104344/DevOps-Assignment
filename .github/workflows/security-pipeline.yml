@@ -45,15 +45,17 @@ jobs:
       - uses: actions/checkout@v4
       - name: Run Semgrep
         run: |
+          # Report-only for now: prints findings and saves JSON + SARIF.
+          # M3 turns this into a blocking gate (fail on ERROR) once the eval() fix is merged.
           semgrep scan \
             --config p/javascript \
             --config p/nodejs \
             --config p/owasp-top-ten \
             --exclude scans --exclude node_modules \
-            --sarif --output semgrep.sarif \
-            --json --output semgrep.json \
+            --json-output=semgrep.json \
+            --sarif-output=semgrep.sarif \
             . || true
-          echo "Semgrep findings:"; \
+          echo "Semgrep findings:"
           grep -o '"check_id"' semgrep.json | wc -l
       - name: Upload Semgrep report
         if: always()
@@ -115,14 +117,14 @@ jobs:
       - uses: actions/checkout@v4
       - name: Build Docker image
         run: docker build -t nodegoat-web:ci .
+      # Trivy runs from its container image instead of aquasecurity/trivy-action:
+      # the action tag previously used here does not resolve, so the job failed at
+      # "Set up job" before scanning anything.
       - name: Trivy scan (report only, full table)
-        uses: aquasecurity/trivy-action@0.28.0
-        with:
-          image-ref: nodegoat-web:ci
-          format: table
-          severity: HIGH,CRITICAL
-          exit-code: '0'
-          output: trivy-report.txt
+        run: |
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+            aquasec/trivy:0.56.2 image --severity HIGH,CRITICAL --exit-code 0 \
+            --format table nodegoat-web:ci | tee trivy-report.txt
       - name: Upload Trivy report
         if: always()
         uses: actions/upload-artifact@v4
@@ -130,10 +132,7 @@ jobs:
           name: trivy-report
           path: trivy-report.txt
       - name: Trivy scan (HARD GATE - fails build on HIGH/CRITICAL)
-        uses: aquasecurity/trivy-action@0.28.0
-        with:
-          image-ref: nodegoat-web:ci
-          format: table
-          severity: HIGH,CRITICAL
-          ignore-unfixed: false
-          exit-code: '1'   # <-- this makes the gate BLOCK the build
+        run: |
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+            aquasec/trivy:0.56.2 image --severity HIGH,CRITICAL \
+            --exit-code 1 nodegoat-web:ci   # <-- exit code 1 makes this gate BLOCK the build
