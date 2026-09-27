@@ -1,5 +1,9 @@
+/* globals $ */
+
 // Moved out of login.html so the Content-Security-Policy (script-src 'self') allows it (V3 XSS fix)
 const areCookiesEnabled = () => {
+    "use strict";
+
     const cookieEnabled = navigator.cookieEnabled;
 
     // When cookieEnabled flag is present and false then cookies are disabled.
@@ -18,10 +22,16 @@ const areCookiesEnabled = () => {
     }
 
     return true;
-}
+};
 
 $(document).ready(() => {
+    "use strict";
+
     if (!areCookiesEnabled()) {
-        $("#page-wrapper").prepend("<div class=\"row\"><div class=\"col-lg-12\"><div class=\"alert alert-danger\">Cookies are not enabled on your browser. Please enable cookies in your browser preferences to continue.</div></div></div>");
+        $("#page-wrapper").prepend(
+            "<div class=\"row\"><div class=\"col-lg-12\"><div class=\"alert alert-danger\">" +
+            "Cookies are not enabled on your browser. Please enable cookies in your browser preferences to continue." +
+            "</div></div></div>"
+        );
     }
 });
