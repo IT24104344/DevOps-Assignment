@@ -7,7 +7,7 @@ const session = require("express-session");
 // const csrf = require('csurf');
 const consolidate = require("consolidate"); // Templating library adapter for Express
 const swig = require("swig");
-// const helmet = require("helmet");
+const helmet = require("helmet");
 const MongoClient = require("mongodb").MongoClient; // Driver for connecting to MongoDB
 const http = require("http");
 const marked = require("marked");
@@ -64,6 +64,20 @@ MongoClient.connect(db, (err, db) => {
     app.use(nosniff());
     */
 
+    // Fix for A3 - XSS (V3, stored XSS): Content-Security-Policy.
+    // Scripts may only load from this origin, so an injected inline <script>
+    // (e.g. a malicious first name) is blocked by the browser even if it reaches the page.
+    app.use(helmet.contentSecurityPolicy({
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'"],
+            styleSrc: ["'self'", "'unsafe-inline'"],
+            imgSrc: ["'self'", "data:"],
+            objectSrc: ["'none'"],
+            frameAncestors: ["'none'"]
+        }
+    }));
+
     // Adding/ remove HTTP Headers for security
     app.use(favicon(__dirname + "/app/assets/favicon.ico"));
 
@@ -82,22 +96,20 @@ MongoClient.connect(db, (err, db) => {
         secret: cookieSecret,
         // Both mandatory in Express v4
         saveUninitialized: true,
-        resave: true
+        resave: true,
         /*
         // Fix for A5 - Security MisConfig
         // Use generic cookie name
         key: "sessionId",
         */
 
-        /*
-        // Fix for A3 - XSS
-        // TODO: Add "maxAge"
+        // Fix for A3 - XSS (V3): set httpOnly explicitly so page scripts can never
+        // read the session cookie (clears Semgrep express-cookie-session-no-httponly)
         cookie: {
             httpOnly: true
             // Remember to start an HTTPS server to get this working
             // secure: true
         }
-        */
 
     }));
 
@@ -133,12 +145,9 @@ MongoClient.connect(db, (err, db) => {
 
     // Template system setup
     swig.setDefaults({
-        // Autoescape disabled
-        autoescape: false
-        /*
-        // Fix for A3 - XSS, enable auto escaping
-        autoescape: true // default value
-        */
+        // Fix for A3 - XSS (V3): enable auto escaping so user data such as
+        // firstName is HTML-encoded when rendered instead of executed
+        autoescape: true
     });
 
     // Insecure HTTP connection

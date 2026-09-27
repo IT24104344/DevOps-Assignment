@@ -61,7 +61,7 @@ variable rather than hardcoded.
 
 ## 1.5 Architecture diagram and trust boundaries
 
-See `docs/architecture.svg`.
+See `docs/architecture.png` (editable source `docs/architecture.svg`).
 
 Three trust zones:
 
